@@ -1,0 +1,137 @@
+
+ activity_main.xml
+<?xml version="1.0" encoding="utf-8"?>
+<LinearLayout xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:tools="http://schemas.android.com/tools"
+    android:layout_width="match_parent"
+    android:layout_height="match_parent"
+    tools:context="com.example.oshin.myjson.MainActivity">
+
+    <TextView
+        android:layout_width="match_parent"
+        android:layout_height="match_parent"
+        android:id="@+id/t1"
+        android:textSize="25sp"
+        android:textStyle="bold"
+
+        />
+
+
+
+</LinearLayout>
+ MainActivity.java
+    private TextView t1;
+
+    @Override
+    protected void onCreate(Bundle savedInstanceState) {
+        super.onCreate(savedInstanceState);
+        setContentView(R.layout.activity_main);
+
+        t1= (TextView) findViewById(R.id.t1);
+
+        jsonTask jTask = new jsonTask();
+        jTask.execute();
+
+    }
+
+
+    public class jsonTask extends AsyncTask<String,String,String>{
+
+
+        @Override
+        protected String doInBackground(String... strings) {
+
+            HttpURLConnection httpURLConnection = null;
+            BufferedReader bufferedReader = null;
+              String name;
+            Integer age;
+            String description;
+            try {
+                URL url = new URL("https://api.myjson.com/bins/b4pdd");
+                httpURLConnection = (HttpURLConnection) url.openConnection();
+                InputStream inputStream = httpURLConnection.getInputStream();
+                bufferedReader= new BufferedReader(new InputStreamReader(inputStream));
+                StringBuffer stringBuffer=new StringBuffer();
+                String line= "";
+                StringBuffer lastBuffer = new StringBuffer();
+                while((line=bufferedReader.readLine()) != null){
+
+                    stringBuffer.append(line);
+
+                }
+                String file = stringBuffer.toString();
+
+
+                JSONObject fileObject = new JSONObject(file);
+                JSONArray  jsonArray = fileObject.getJSONArray("studentinfo");
+
+                for(int i=0; i<jsonArray.length(); i++) {
+                    JSONObject arrayObject = jsonArray.getJSONObject(i);
+                    name = arrayObject.getString("name");
+                    age = arrayObject.getInt("age");
+                    description = arrayObject.getString("description");
+
+                    lastBuffer.append(name+"\n"+age+"\n"+description+"\n\n");
+                }
+                return  lastBuffer.toString();
+
+
+
+            } catch (MalformedURLException e) {
+                e.printStackTrace();
+            } catch (IOException e) {
+                e.printStackTrace();
+            } catch (JSONException e) {
+                e.printStackTrace();
+            } finally {
+                httpURLConnection.disconnect();
+                try {
+                    bufferedReader.close();
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+            }
+
+
+            return null;
+        }
+
+        @Override
+        protected void onPostExecute(String s) {
+            super.onPostExecute(s);
+            t1.setText(s);
+        }
+    }
+ manifest.xml
+<?xml version="1.0" encoding="utf-8"?>
+<manifest xmlns:android="http://schemas.android.com/apk/res/android"
+    package="com.example.oshin.myjson">
+
+    <uses-permission android:name="android.permission.INTERNET"></uses-permission>
+
+
+    <application
+        android:allowBackup="true"
+        android:icon="@mipmap/ic_launcher"
+        android:label="@string/app_name"
+        android:roundIcon="@mipmap/ic_launcher_round"
+        android:supportsRtl="true"
+        android:theme="@style/AppTheme">
+        <activity android:name=".MainActivity">
+            <intent-filter>
+                <action android:name="android.intent.action.MAIN" />
+
+                <category android:name="android.intent.category.LAUNCHER" />
+            </intent-filter>
+        </activity>
+    </application>
+
+</manifest>
+ @TasnuvaOshin
+  
+            
+ 
+ 
+
+
